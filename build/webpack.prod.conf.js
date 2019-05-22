@@ -64,6 +64,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       filename: config.build.index,
       template: 'index.html',
       inject: true,
+      chunks: ['manifest', 'vendor', 'app'],
       minify: {
         removeComments: true,
         collapseWhitespace: true,
@@ -118,6 +119,24 @@ const webpackConfig = merge(baseWebpackConfig, {
     ])
   ]
 })
+
+for(let prop in utils.multipleEntrys){
+  webpackConfig.plugins.push(new HtmlWebpackPlugin({
+    filename: `${prop}.html`,
+    template: `./src/${prop}/${prop}.html`,
+    inject: true,
+    chunks: ['manifest', 'vendor', prop],
+    minify: {
+      removeComments: true,
+      collapseWhitespace: true,
+      removeAttributeQuotes: true
+      // more options:
+      // https://github.com/kangax/html-minifier#options-quick-reference
+    },
+    // necessary to consistently work with multiple chunks via CommonsChunkPlugin
+    chunksSortMode: 'dependency'
+  }))
+}
 
 if (config.build.productionGzip) {
   const CompressionWebpackPlugin = require('compression-webpack-plugin')
